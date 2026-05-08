@@ -142,6 +142,49 @@ io.on("connection", (socket) => {
     socket.on("stop typing", (data) => {
         socket.to(data.room).emit("stop typing");
     });
+
+    // ===============================
+    // 🎥 VIDEO / AUDIO CALL EVENTS
+    // ===============================
+
+    // CALL USER
+    socket.on("call-user", (data) => {
+
+        socket.to(data.room).emit("call-made", {
+            offer: data.offer,
+            room: data.room
+        });
+
+    });
+
+
+    // RECEIVE ANSWER
+    socket.on("make-answer", (data) => {
+
+        socket.to(data.room).emit("answer-made", {
+            answer: data.answer
+        });
+
+    });
+
+
+    // ICE CANDIDATES
+    socket.on("ice-candidate", (data) => {
+
+        socket.to(data.room).emit("ice-candidate", {
+            candidate: data.candidate
+        });
+
+    });
+
+
+    // END CALL
+    socket.on("end-call", (data) => {
+
+        socket.to(data.room).emit("end-call");
+
+    });
+
 });
 
 // ✅ Start server

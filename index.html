@@ -31,9 +31,36 @@
     class="hidden w-[750px] h-[550px] bg-white rounded-2xl shadow-xl flex flex-col">
 
     <!-- HEADER -->
-    <div id="roomTitle"
-        class="bg-indigo-600 text-white text-center p-3 font-bold">
-        Room
+    <!-- ✅ UPDATED HEADER -->
+    <div class="bg-indigo-600 text-white p-3 flex items-center justify-between">
+
+        <!-- ROOM TITLE -->
+        <div id="roomTitle" class="font-bold">
+            Room
+        </div>
+
+        <!-- ✅ NEW CALL BUTTONS -->
+        <div class="flex items-center gap-2">
+
+            <!-- AUDIO CALL -->
+            <button id="audioCallBtn"
+                class="bg-green-500 hover:bg-green-600 px-3 py-1 rounded-lg">
+                📞 Audio
+            </button>
+
+            <!-- VIDEO CALL -->
+            <button id="videoCallBtn"
+                class="bg-purple-500 hover:bg-purple-600 px-3 py-1 rounded-lg">
+                🎥 Video
+            </button>
+
+            <!-- END CALL -->
+            <button id="endCallBtn"
+                class="hidden bg-red-500 hover:bg-red-600 px-3 py-1 rounded-lg">
+                ❌ End
+            </button>
+
+        </div>
     </div>
 
     <div class="flex flex-1 overflow-hidden min-h-0">
@@ -44,7 +71,6 @@
             <ul id="userList" class="space-y-2"></ul>
         </div>
 
-        <!-- CHAT -->
         <!-- CHAT -->
         <div class="flex-1 flex flex-col min-h-0 h-full overflow-hidden">
 
@@ -94,6 +120,29 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- ✅ NEW VIDEO CALL CONTAINER -->
+<div id="callContainer"
+    class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center gap-4">
+
+    <!-- LOCAL VIDEO -->
+    <video
+        id="localVideo"
+        autoplay
+        muted
+        playsinline
+        class="w-64 rounded-xl border-2 border-white bg-black">
+    </video>
+
+    <!-- REMOTE VIDEO -->
+    <video
+        id="remoteVideo"
+        autoplay
+        playsinline
+        class="w-[500px] rounded-xl border-2 border-white bg-black">
+    </video>
+
 </div>
 
 <script src="/socket.io/socket.io.js"></script>

@@ -18,6 +18,30 @@ let username = "";
 let room = "";
 let typingTimeout;
 
+// ===============================
+// 🎥 VIDEO / AUDIO CALL VARIABLES
+// ===============================
+
+let localStream;
+let peerConnection;
+
+const servers = {
+    iceServers: [
+        {
+            urls: ["stun:stun.l.google.com:19302"]
+        }
+    ]
+};
+
+const localVideo = document.getElementById("localVideo");
+const remoteVideo = document.getElementById("remoteVideo");
+
+const videoCallBtn = document.getElementById("videoCallBtn");
+const audioCallBtn = document.getElementById("audioCallBtn");
+const endCallBtn = document.getElementById("endCallBtn");
+
+const callContainer = document.getElementById("callContainer");
+
 // 🔵 JOIN ROOM
 joinBtn.addEventListener("click", () => {
     username = usernameInput.value;
@@ -201,6 +225,202 @@ socket.on("stop typing", () => {
     typingDiv.innerText = "";
 });
 
+// ===============================
+// 🎥 START VIDEO CALL
+// ===============================
+
+videoCallBtn.addEventListener("click", async () => {
+
+    try {
+
+        callContainer.classList.remove("hidden");
+        endCallBtn.classList.remove("hidden");
+
+        // GET CAMERA + MIC
+        localStream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true
+        });
+
+        localVideo.srcObject = localStream;
+
+        createPeerConnection();
+
+        // CREATE OFFER
+        const offer = await peerConnection.createOffer();
+
+        await peerConnection.setLocalDescription(offer);
+
+        socket.emit("call-user", {
+            room,
+            offer
+        });
+
+    } catch (err) {
+
+        console.log(err);
+        alert("Camera/Microphone permission denied");
+
+    }
+});
+
+
+// ===============================
+// 📞 START AUDIO CALL
+// ===============================
+
+audioCallBtn.addEventListener("click", async () => {
+
+    try {
+
+        callContainer.classList.remove("hidden");
+        endCallBtn.classList.remove("hidden");
+
+        // MIC ONLY
+        localStream = await navigator.mediaDevices.getUserMedia({
+            video: false,
+            audio: true
+        });
+
+        localVideo.srcObject = localStream;
+
+        createPeerConnection();
+
+        const offer = await peerConnection.createOffer();
+
+        await peerConnection.setLocalDescription(offer);
+
+        socket.emit("call-user", {
+            room,
+            offer
+        });
+
+    } catch (err) {
+
+        console.log(err);
+        alert("Microphone permission denied");
+
+    }
+});
+
+// ===============================
+// 📥 RECEIVE CALL
+// ===============================
+
+socket.on("call-made", async (data) => {
+
+    try {
+
+        callContainer.classList.remove("hidden");
+        endCallBtn.classList.remove("hidden");
+
+        localStream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true
+        });
+
+        localVideo.srcObject = localStream;
+
+        createPeerConnection();
+
+        // SET REMOTE OFFER
+        await peerConnection.setRemoteDescription(
+            new RTCSessionDescription(data.offer)
+        );
+
+        // CREATE ANSWER
+        const answer = await peerConnection.createAnswer();
+
+        await peerConnection.setLocalDescription(answer);
+
+        socket.emit("make-answer", {
+            room,
+            answer
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+    }
+});
+
+// ===============================
+// ✅ RECEIVE ANSWER
+// ===============================
+
+socket.on("answer-made", async (data) => {
+
+    try {
+
+        await peerConnection.setRemoteDescription(
+            new RTCSessionDescription(data.answer)
+        );
+
+    } catch (err) {
+
+        console.log(err);
+
+    }
+});
+
+// ===============================
+// ❄️ ICE CANDIDATES
+// ===============================
+
+socket.on("ice-candidate", async (data) => {
+
+    try {
+
+        if (peerConnection) {
+
+            await peerConnection.addIceCandidate(data.candidate);
+
+        }
+
+    } catch (err) {
+
+        console.log(err);
+
+    }
+});
+
+// ===============================
+// ❌ END CALL
+// ===============================
+
+endCallBtn.addEventListener("click", endCall);
+
+socket.on("end-call", endCall);
+
+function endCall() {
+
+    callContainer.classList.add("hidden");
+    endCallBtn.classList.add("hidden");
+
+    // CLOSE PEER
+    if (peerConnection) {
+
+        peerConnection.close();
+        peerConnection = null;
+
+    }
+
+    // STOP CAMERA/MIC
+    if (localStream) {
+
+        localStream.getTracks().forEach(track => track.stop());
+
+    }
+
+    // CLEAR VIDEOS
+    localVideo.srcObject = null;
+    remoteVideo.srcObject = null;
+
+    socket.emit("end-call", { room });
+}
+
+
 msgInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
         sendBtn.click();
@@ -298,6 +518,41 @@ socket.on("load messages", (messages) => {
 
     chatBox.scrollTop = chatBox.scrollHeight;
 });
+
+// ===============================
+// 🎥 CREATE PEER CONNECTION
+// ===============================
+
+function createPeerConnection() {
+
+    peerConnection = new RTCPeerConnection(servers);
+
+    // SEND ICE CANDIDATES
+    peerConnection.onicecandidate = (event) => {
+
+        if (event.candidate) {
+
+            socket.emit("ice-candidate", {
+                room,
+                candidate: event.candidate
+            });
+        }
+    };
+
+    // RECEIVE REMOTE STREAM
+    peerConnection.ontrack = (event) => {
+
+        remoteVideo.srcObject = event.streams[0];
+    };
+
+    // ADD LOCAL TRACKS
+    localStream.getTracks().forEach((track) => {
+
+        peerConnection.addTrack(track, localStream);
+
+    });
+}
+
 
 let userList = document.getElementById("userList");
 
