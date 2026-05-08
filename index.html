@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat App</title>
+
+    <!-- ✅ Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600">
+
+<!-- 🔵 JOIN SCREEN -->
+<div id="joinScreen" class="bg-white p-6 rounded-xl shadow-lg text-center">
+    <h2 class="text-xl font-bold mb-4">Join Chat</h2>
+
+    <input id="usernameInput" placeholder="Enter name"
+        class="border p-2 w-full mb-3 rounded" />
+
+    <input id="roomInput" placeholder="Enter room"
+        class="border p-2 w-full mb-3 rounded" />
+
+    <button id="joinBtn"
+        class="bg-indigo-600 text-white px-4 py-2 rounded w-full">
+        Join
+    </button>
+</div>
+
+<!-- 🟢 CHAT SCREEN -->
+<div id="chatScreen"
+    class="hidden w-[750px] h-[550px] bg-white rounded-2xl shadow-xl flex flex-col">
+
+    <!-- HEADER -->
+    <div id="roomTitle"
+        class="bg-indigo-600 text-white text-center p-3 font-bold">
+        Room
+    </div>
+
+    <div class="flex flex-1 overflow-hidden min-h-0">
+
+        <!-- USERS -->
+        <div class="w-[180px] border-r p-3 overflow-y-auto">
+            <h3 class="font-semibold mb-2">Users</h3>
+            <ul id="userList" class="space-y-2"></ul>
+        </div>
+
+        <!-- CHAT -->
+        <!-- CHAT -->
+        <div class="flex-1 flex flex-col min-h-0 h-full overflow-hidden">
+
+            <!-- MESSAGES -->
+            <div id="chatBox"
+                class="flex-1 overflow-y-auto p-3 flex flex-col gap-3 bg-gray-50">
+            </div>
+
+            <!-- TYPING -->
+            <div id="typingStatus"
+                class="text-gray-500 text-sm px-3 h-5">
+            </div>
+
+            <!-- INPUT AREA -->
+            <div class="flex items-center p-3 border-t gap-2 bg-white shrink-0">
+
+                <!-- FILE BUTTON -->
+                <button
+                    onclick="document.getElementById('fileInput').click()"
+                    class="w-11 h-11 rounded-full bg-gray-200 hover:bg-gray-300 text-xl">
+                    📎
+                </button>
+
+                <!-- HIDDEN FILE INPUT -->
+                <input
+                    type="file"
+                    id="fileInput"
+                    class="hidden"
+                    accept="image/*,video/*,.pdf,.doc,.docx,.txt,.zip"
+                />
+
+                <!-- MESSAGE INPUT -->
+                <input
+                    id="msgInput"
+                    type="text"
+                    placeholder="Type message..."
+                    class="flex-1 border rounded-full px-4 py-3 outline-none focus:border-indigo-500"
+                />
+
+                <!-- SEND BUTTON -->
+                <button
+                    id="sendBtn"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-3 rounded-full">
+                    Send
+                </button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/script.js"></script>
+
+</body>
+</html>
