@@ -61,18 +61,45 @@ sendBtn.addEventListener("click", () => {
 
 // 🔴 RECEIVE MESSAGE
 socket.on("chat message", (data) => {
+    let wrapper = document.createElement("div");
+    wrapper.classList.add("w-full", "flex", "mb-2");
+
     let div = document.createElement("div");
 
-    div.classList.add("max-w-[70%]", "px-3", "py-2", "rounded-xl", "text-sm");
+    div.classList.add(
+        "max-w-[70%]",
+        "px-4",
+        "py-2",
+        "rounded-2xl",
+        "text-sm",
+        "shadow"
+    );
 
     if (data.user === username) {
-        div.classList.add("bg-indigo-600", "text-white", "self-end");
+
+        wrapper.classList.add("justify-end");
+
+        div.classList.add(
+            "bg-indigo-600",
+            "text-white",
+            "rounded-br-none"
+        );
+
     } else {
-        div.classList.add("bg-gray-200", "self-start");
+
+        wrapper.classList.add("justify-start");
+
+        div.classList.add(
+            "bg-gray-200",
+            "text-black",
+            "rounded-bl-none"
+        );
     }
 
     div.innerHTML = `
-        <div class="text-xs font-bold">${data.user}</div>
+        <div class="text-xs font-semibold mb-1 opacity-80">
+            ${data.user}
+        </div>
         
         <div>
             ${
@@ -100,7 +127,8 @@ socket.on("chat message", (data) => {
         <div class="text-[10px] opacity-70">${data.time}</div>
     `;
 
-    chatBox.appendChild(div);
+    wrapper.appendChild(div);
+    chatBox.appendChild(wrapper);
     chatBox.scrollTop = chatBox.scrollHeight;
 
     typingDiv.innerText = "";
@@ -180,6 +208,9 @@ msgInput.addEventListener("keypress", (e) => {
 });
 
 socket.on("system message", (data) => {
+    let wrapper = document.createElement("div");
+    wrapper.classList.add("w-full", "flex", "mb-2");
+
     let div = document.createElement("div");
 
     div.style.textAlign = "center";
@@ -189,7 +220,8 @@ socket.on("system message", (data) => {
 
     div.innerText = data.text;
 
-    chatBox.appendChild(div);
+    wrapper.appendChild(div);
+    chatBox.appendChild(wrapper);
     chatBox.scrollTop = chatBox.scrollHeight;
 });
 
@@ -199,16 +231,40 @@ socket.on("load messages", (messages) => {
     messages.forEach((data) => {
         let div = document.createElement("div");
 
-        div.classList.add("max-w-[70%]", "px-3", "py-2", "rounded-xl", "text-sm");
+        div.classList.add(
+            "max-w-[70%]",
+            "px-4",
+            "py-2",
+            "rounded-2xl",
+            "text-sm",
+            "shadow"
+        );
 
         if (data.user === username) {
-            div.classList.add("bg-indigo-600", "text-white", "self-end");
+
+            wrapper.classList.add("justify-end");
+
+            div.classList.add(
+                "bg-indigo-600",
+                "text-white",
+                "rounded-br-none"
+            );
+
         } else {
-            div.classList.add("bg-gray-200", "self-start");
+
+            wrapper.classList.add("justify-start");
+
+            div.classList.add(
+                "bg-gray-200",
+                "text-black",
+                "rounded-bl-none"
+            );
         }
 
         div.innerHTML = `
-            <div class="text-xs font-bold">${data.user}</div>
+            <div class="text-xs font-semibold mb-1 opacity-80">
+                ${data.user}
+            </div>
             
             <div>
                 ${
@@ -236,7 +292,8 @@ socket.on("load messages", (messages) => {
             <div class="text-[10px] opacity-70">${data.time}</div>
         `;
 
-        chatBox.appendChild(div);
+        wrapper.appendChild(div);
+        chatBox.appendChild(wrapper);
     });
 
     chatBox.scrollTop = chatBox.scrollHeight;
